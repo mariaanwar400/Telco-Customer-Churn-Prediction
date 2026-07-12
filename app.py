@@ -1,9 +1,9 @@
 """
-Customer Churn Prediction - Streamlit Web App
+Customer Churn Prediction - Streamlit Web App (Sidebar Version)
 Author: Maria Anwar
-Description: Interactive web app that predicts whether a telecom customer
-is likely to churn, based on a trained ML model (Logistic Regression /
-Random Forest / XGBoost - any sklearn-API compatible model works).
+Description: Interactive web app with a sidebar input panel that predicts
+whether a telecom customer is likely to churn, using a trained ML model
+(Logistic Regression / Random Forest / XGBoost - any sklearn-API model works).
 """
 
 import streamlit as st
@@ -17,8 +17,8 @@ import joblib
 st.set_page_config(
     page_title="Customer Churn Predictor",
     page_icon="📊",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ----------------------------------------------------------------------------
@@ -29,43 +29,36 @@ st.markdown("""
         .main-title {
             font-size: 2.3rem;
             font-weight: 700;
-            text-align: center;
             color: #1f77b4;
             margin-bottom: 0px;
         }
         .subtitle {
-            text-align: center;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .result-box-churn {
             background-color: #ffe5e5;
             border: 2px solid #ff4b4b;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
-            margin-top: 20px;
         }
         .result-box-safe {
             background-color: #e5ffe9;
             border: 2px solid #21c354;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
-            margin-top: 20px;
         }
-        .stButton>button {
-            width: 100%;
-            background-color: #1f77b4;
-            color: white;
-            font-weight: 600;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
+        .metric-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
         }
-        .stButton>button:hover {
-            background-color: #145a86;
-            color: white;
+        section[data-testid="stSidebar"] {
+            background-color: #f5f7fa;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -93,54 +86,44 @@ except FileNotFoundError:
 # ----------------------------------------------------------------------------
 st.markdown('<p class="main-title">📊 Customer Churn Predictor</p>', unsafe_allow_html=True)
 st.markdown(
-    '<p class="subtitle">Enter customer details below to predict the likelihood of churn</p>',
+    '<p class="subtitle">Fill in customer details in the sidebar and click Predict.</p>',
     unsafe_allow_html=True
 )
 
 # ----------------------------------------------------------------------------
-# INPUT FORM
+# SIDEBAR — ALL USER INPUTS LIVE HERE
 # ----------------------------------------------------------------------------
-with st.form("churn_form"):
+st.sidebar.header("🧾 Customer Details")
 
-    st.subheader("👤 Customer Profile")
-    col1, col2 = st.columns(2)
-    with col1:
-        gender = st.selectbox("Gender", ["Female", "Male"])
-        senior_citizen = st.selectbox("Senior Citizen", ["No", "Yes"])
-        partner = st.selectbox("Has Partner", ["No", "Yes"])
-    with col2:
-        dependents = st.selectbox("Has Dependents", ["No", "Yes"])
-        tenure = st.slider("Tenure (months)", min_value=0, max_value=72, value=12)
+st.sidebar.subheader("👤 Profile")
+gender = st.sidebar.selectbox("Gender", ["Female", "Male"])
+senior_citizen = st.sidebar.selectbox("Senior Citizen", ["No", "Yes"])
+partner = st.sidebar.selectbox("Has Partner", ["No", "Yes"])
+dependents = st.sidebar.selectbox("Has Dependents", ["No", "Yes"])
+tenure = st.sidebar.slider("Tenure (months)", min_value=0, max_value=72, value=12)
 
-    st.subheader("📞 Services")
-    col3, col4 = st.columns(2)
-    with col3:
-        phone_service = st.selectbox("Phone Service", ["No", "Yes"])
-        multiple_lines = st.selectbox("Multiple Lines", ["No", "Yes", "No phone service"])
-        internet_service = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
-        online_security = st.selectbox("Online Security", ["No", "Yes", "No internet service"])
-        online_backup = st.selectbox("Online Backup", ["No", "Yes", "No internet service"])
-    with col4:
-        device_protection = st.selectbox("Device Protection", ["No", "Yes", "No internet service"])
-        tech_support = st.selectbox("Tech Support", ["No", "Yes", "No internet service"])
-        streaming_tv = st.selectbox("Streaming TV", ["No", "Yes", "No internet service"])
-        streaming_movies = st.selectbox("Streaming Movies", ["No", "Yes", "No internet service"])
+st.sidebar.subheader("📞 Services")
+phone_service = st.sidebar.selectbox("Phone Service", ["No", "Yes"])
+multiple_lines = st.sidebar.selectbox("Multiple Lines", ["No", "Yes", "No phone service"])
+internet_service = st.sidebar.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
+online_security = st.sidebar.selectbox("Online Security", ["No", "Yes", "No internet service"])
+online_backup = st.sidebar.selectbox("Online Backup", ["No", "Yes", "No internet service"])
+device_protection = st.sidebar.selectbox("Device Protection", ["No", "Yes", "No internet service"])
+tech_support = st.sidebar.selectbox("Tech Support", ["No", "Yes", "No internet service"])
+streaming_tv = st.sidebar.selectbox("Streaming TV", ["No", "Yes", "No internet service"])
+streaming_movies = st.sidebar.selectbox("Streaming Movies", ["No", "Yes", "No internet service"])
 
-    st.subheader("💳 Account & Billing")
-    col5, col6 = st.columns(2)
-    with col5:
-        contract = st.selectbox("Contract Type", ["Month-to-month", "One year", "Two year"])
-        paperless_billing = st.selectbox("Paperless Billing", ["No", "Yes"])
-        payment_method = st.selectbox(
-            "Payment Method",
-            ["Bank transfer (automatic)", "Credit card (automatic)",
-             "Electronic check", "Mailed check"]
-        )
-    with col6:
-        monthly_charges = st.number_input("Monthly Charges ($)", min_value=0.0, max_value=200.0, value=70.0, step=0.5)
-        total_charges = st.number_input("Total Charges ($)", min_value=0.0, max_value=10000.0, value=840.0, step=10.0)
+st.sidebar.subheader("💳 Account & Billing")
+contract = st.sidebar.selectbox("Contract Type", ["Month-to-month", "One year", "Two year"])
+paperless_billing = st.sidebar.selectbox("Paperless Billing", ["No", "Yes"])
+payment_method = st.sidebar.selectbox(
+    "Payment Method",
+    ["Bank transfer (automatic)", "Credit card (automatic)", "Electronic check", "Mailed check"]
+)
+monthly_charges = st.sidebar.number_input("Monthly Charges ($)", min_value=0.0, max_value=200.0, value=70.0, step=0.5)
+total_charges = st.sidebar.number_input("Total Charges ($)", min_value=0.0, max_value=10000.0, value=840.0, step=10.0)
 
-    submitted = st.form_submit_button("🔮 Predict Churn")
+predict_button = st.sidebar.button("🔮 Predict Churn", use_container_width=True)
 
 # ----------------------------------------------------------------------------
 # BUILD FEATURE VECTOR (must match the exact columns used during training)
@@ -196,7 +179,6 @@ def build_input_dataframe():
         "PaymentMethod_Mailed check": 1 if payment_method == "Mailed check" else 0,
     }
 
-    # Column order must exactly match X_train.columns from training
     column_order = [
         "SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges",
         "gender_Male", "Partner_Yes", "Dependents_Yes", "PhoneService_Yes",
@@ -214,16 +196,23 @@ def build_input_dataframe():
         "PaymentMethod_Electronic check", "PaymentMethod_Mailed check"
     ]
 
-    df_input = pd.DataFrame([data])[column_order]
-    return df_input
+    return pd.DataFrame([data])[column_order]
 
 # ----------------------------------------------------------------------------
-# PREDICTION
+# MAIN AREA — SUMMARY CARDS + PREDICTION RESULT
 # ----------------------------------------------------------------------------
-if submitted:
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown(f"""<div class="metric-card"><b>Tenure</b><br>{tenure} months</div>""", unsafe_allow_html=True)
+with col2:
+    st.markdown(f"""<div class="metric-card"><b>Monthly Charges</b><br>${monthly_charges:.2f}</div>""", unsafe_allow_html=True)
+with col3:
+    st.markdown(f"""<div class="metric-card"><b>Contract</b><br>{contract}</div>""", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+if predict_button:
     input_df = build_input_dataframe()
-
-    # Scale numeric features using the SAME scaler fitted on training data
     input_scaled = scaler.transform(input_df)
 
     prediction = model.predict(input_scaled)[0]
@@ -232,19 +221,24 @@ if submitted:
     if prediction == 1:
         st.markdown(f"""
             <div class="result-box-churn">
-                <h2>⚠️ High Risk of Churn</h2>
+                <h2>⚠️ Prediction: Churn</h2>
                 <p style="font-size:1.2rem;">Churn Probability: <b>{probability*100:.1f}%</b></p>
-                <p>This customer is likely to leave. Consider proactive retention offers.</p>
+                <p>This customer is likely to leave. Consider a retention offer.</p>
             </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown(f"""
             <div class="result-box-safe">
-                <h2>✅ Low Risk of Churn</h2>
+                <h2>✅ Prediction: Not Churn</h2>
                 <p style="font-size:1.2rem;">Churn Probability: <b>{probability*100:.1f}%</b></p>
                 <p>This customer is likely to stay.</p>
             </div>
         """, unsafe_allow_html=True)
+
+    with st.expander("🔍 View Raw Model Input (for debugging/transparency)"):
+        st.dataframe(input_df)
+else:
+    st.info("👈 Fill in the customer details in the sidebar, then click **Predict Churn**.")
 
 # ----------------------------------------------------------------------------
 # FOOTER
