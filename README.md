@@ -54,7 +54,7 @@ This project builds a machine learning pipeline that:
 | **`TotalCharges`, `tenure`, and `MonthlyCharges`** are the top 3 predictive features (~54% combined importance) | Billing and loyalty history are the strongest churn signals |
 | Fiber optic internet users and electronic check payers show elevated churn | Investigate service quality and payment friction for these segments |
 
-![Feature Importance](images/feature_importance.png)
+![Feature Importance](./images/feature_importance.png)
 
 ---
 
