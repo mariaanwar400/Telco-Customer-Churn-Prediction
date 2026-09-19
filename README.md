@@ -5,7 +5,7 @@ An end-to-end machine learning project that predicts telecom customer churn and 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
-
+🔗 **[Live Demo](https://mariaanwar400-telco-churn.streamlit.app/)** — Try the app yourself!
 ---
 
 ## 🎯 Project Overview
@@ -148,7 +148,6 @@ Telco-Customer-Churn-Prediction/
 - [ ] Hyperparameter tuning with `GridSearchCV` / `RandomizedSearchCV`
 - [ ] Experiment with gradient boosting models (XGBoost, LightGBM)
 - [ ] Add SHAP values for individual-prediction explainability
-- [ ] Deploy the Streamlit app publicly via Streamlit Community Cloud
 - [ ] Add automated unit tests for the preprocessing pipeline
 
 ---
